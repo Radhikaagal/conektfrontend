@@ -7,6 +7,7 @@ import profile from "./components/profile";
 import commute from "./components/commute";
 import notes from "./components/notes";
 import dorm from "./components/dorm";
+import comments from "./components/comments";
 import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/commute"  component={commute} />
         <Route path="/notes"  component={notes} />
         <Route path="/dorm"  component={dorm} />
+        <Route path="/comments"  component={comments} />
       </Switch>
     </Router>
   );

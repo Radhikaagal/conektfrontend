@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, Button } from "react-bootstrap";
-const Miniform = props => (
+const Miniformprofile = props => (
   <div>
     <Form onSubmit={props.gettext}>
     <Form.Label>Username</Form.Label>
@@ -24,4 +24,4 @@ const Miniform = props => (
   </div>
 );
 
-export default Miniform;
+export default Miniformprofile;

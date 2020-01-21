@@ -4,19 +4,29 @@ import conekt from "./../conekt.png";
 import Axios from "axios";
 import { Redirect } from "react-router-dom";
 import Miniform from "./Miniform";
+import Miniformcomment from "./Miniformcomment";
 class dorm extends Component {
   constructor(props) {
     super(props);
     this.onclick = this.onclick.bind(this);
     this.onclicknewpost = this.onclicknewpost.bind(this);
     this.gettext = this.gettext.bind(this);
+    this.getcomment = this.getcomment.bind(this);
     this.onclickdashboard = this.onclickdashboard.bind(this);
+    this.newcomment = this.newcomment.bind(this);
+    this.seecomments = this.seecomments.bind(this);
     this.state = {
       redirect: false,
       dashboard: false,
       data: null,
       createpost: false,
-      post: ""
+      post: "",
+      createcomment: false,
+      comment: "",
+      ppid: "",
+      data2: [],
+      mainpost: "",
+      seecom: false
     };
   }
 
@@ -24,9 +34,40 @@ class dorm extends Component {
     this.setState({ data: this.props.location.state.data });
   }
 
+  async seecomments(id, text) {
+    Axios.post("https://conektapi.herokuapp.com/posts/get-comments", {
+      usertoken: this.props.location.state.userToken,
+      parentPostId: id
+    })
+      .then(res => {
+        if (res.data.message) {
+          if (res.data.data.length > 0) {
+            this.setState({
+              mainpost: text,
+              ppid: id,
+              data2: res.data.data,
+              seecom: true
+            });
+          } else {
+            alert("no comments");
+          }
+        }
+      })
+      .catch(error => {
+        alert(error.response.data.message);
+      });
+  }
+
   onclicknewpost() {
     this.setState({
       createpost: true
+    });
+  }
+
+  newcomment(id) {
+    this.setState({
+      createcomment: true,
+      ppid: id
     });
   }
 
@@ -55,6 +96,40 @@ class dorm extends Component {
         .catch(error => {
           this.setState({
             createpost: false
+          });
+          alert(error);
+        });
+    }
+  }
+
+  async getcomment(e) {
+    e.preventDefault();
+    const comment = e.target.elements.post.value;
+    console.log(comment);
+    console.log(this.state.ppid);
+    if (comment) {
+      Axios.post("https://conektapi.herokuapp.com/posts/create-comment", {
+        usertoken: this.props.location.state.userToken,
+        text: comment,
+        parentPostId: this.state.ppid,
+        postCategory: "accomodation"
+      })
+        .then(res => {
+          if (res.data.message) {
+            this.setState({
+              createcomment: false,
+              ppid: ""
+            });
+            alert("Done! Redirecting you back to dashboard");
+            this.setState({
+              dashboard: true
+            });
+          }
+        })
+        .catch(error => {
+          this.setState({
+            createcomment: false,
+            ppid: ""
           });
           alert(error);
         });
@@ -95,21 +170,53 @@ class dorm extends Component {
         />
       );
     }
+    if (this.state.seecom) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/comments",
+            state: {
+              userToken: this.props.location.state.userToken,
+              data: this.state.data2,
+              text: this.state.mainpost,
+              parent: this.state.ppid,
+              category: "accomodation"
+            }
+          }}
+        />
+      );
+    }
   }
   render() {
-    const obj = this.state.data.map(({ opId, opName, text, displayTime }) => {
-      return (
-        <Card body style={{ margin: "4px" }}>
-          <h4 key={opId}>{text}</h4>
-          <p>
-            Posted by: {opName} on {displayTime}
-          </p>
-          <Button variant="dark" style={{ float: "right" }}>
-            Comment
-          </Button>
-        </Card>
-      );
-    });
+    const obj = this.state.data.map(
+      ({ _id, opId, opName, text, displayTime }) => {
+        return (
+          <Card body style={{ margin: "4px" }}>
+            <h4 key={opId}>{text}</h4>
+            <p>
+              Posted by: {opName} on {displayTime}
+            </p>
+            <Button
+              onClick={() => this.newcomment(_id)}
+              variant="dark"
+              style={{ float: "right" }}
+            >
+              Comment
+            </Button>
+            {this.state.createcomment ? (
+              <Miniformcomment getcomment={this.getcomment} />
+            ) : null}
+            <Button
+              onClick={() => this.seecomments(_id, text)}
+              variant="dark"
+              style={{ float: "right" }}
+            >
+              See comments
+            </Button>
+          </Card>
+        );
+      }
+    );
     return (
       <div>
         {this.renderRedirect()}
@@ -149,8 +256,8 @@ class dorm extends Component {
         {this.state.createpost ? <Miniform gettext={this.gettext} /> : null}
         <div className="back" style={{ height: "100%" }}>
           <div>{obj}</div>
-        </div></div>
-      
+        </div>
+      </div>
     );
   }
 }
