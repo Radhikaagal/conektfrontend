@@ -17,7 +17,7 @@ class profile extends Component {
       redirect: false,
       dashboard: false,
       data: null,
-      editprofile: false
+      editprofile: false,
     };
   }
 
@@ -27,7 +27,7 @@ class profile extends Component {
 
   onclickedit() {
     this.setState({
-      editprofile: true
+      editprofile: true,
     });
   }
 
@@ -40,22 +40,22 @@ class profile extends Component {
     Axios.post("https://conektapi.herokuapp.com/users/edit-profile", {
       usertoken: this.props.location.state.userToken,
       newUserName: username,
-      newBio: bio
+      newBio: bio,
     })
-      .then(res => {
+      .then((res) => {
         if (res.data.message) {
           this.setState({
-            editprofile: false
+            editprofile: false,
           });
           alert("Done! Redirecting you back to dashboard");
           this.setState({
-            dashboard: true
+            dashboard: true,
           });
         }
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({
-          editprofile: false
+          editprofile: false,
         });
         alert(error);
       });
@@ -66,13 +66,13 @@ class profile extends Component {
       "https://conektapi.herokuapp.com/users/logout/" +
         this.props.location.state.userToken
     )
-      .then(res => {
+      .then((res) => {
         if (res.data.message) {
           alert("LOGGED out successfully");
           this.setState({ redirect: true });
         }
       })
-      .catch(error => {
+      .catch((error) => {
         alert(error.response.data.message, "danger");
       });
   }
@@ -85,11 +85,11 @@ class profile extends Component {
     // alert(id);
     Axios.post("https://conektapi.herokuapp.com/posts/delete-post", {
       usertoken: this.props.location.state.userToken,
-      postid: id 
-    }).then(res => {
+      postid: id,
+    }).then((res) => {
       if (res.data.message) {
         this.setState({
-          dashboard: true
+          dashboard: true,
         });
       }
     });
@@ -104,7 +104,7 @@ class profile extends Component {
         <Redirect
           to={{
             pathname: "/dashboard",
-            state: { userToken: this.props.location.state.userToken }
+            state: { userToken: this.props.location.state.userToken },
           }}
         />
       );
@@ -160,7 +160,7 @@ class profile extends Component {
         </Navbar>
         <div className="back" style={{ textAlign: "center", height: "100%" }}>
           <div style={{ display: "inline-block", marginTop: "30px" }}>
-            <Card style={{ width: "100vh", margin: "10px" }}>
+            <Card style ={{width:'50%', marginLeft:'25%'}}>
               <Card.Body>
                 <Card.Title>{JSON.parse(this.state.data).userName}</Card.Title>
                 <div>
